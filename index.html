@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>iPhone Auto Copy Tool | iOS 14.1 - 26.5</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+      position: relative;
+    }
+
+    .main-container {
+      max-width: 750px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(10px);
+      border-radius: 48px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.3);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: linear-gradient(120deg, #1e293b, #0f172a);
+      padding: 30px 28px 25px;
+      text-align: center;
+      color: white;
+    }
+
+    .card-header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card-header p {
+      margin-top: 10px;
+      opacity: 0.8;
+      font-size: 0.9rem;
+    }
+
+    .feature-badge {
+      background: rgba(255,255,255,0.2);
+      border-radius: 40px;
+      padding: 4px 12px;
+      font-size: 0.75rem;
+      display: inline-block;
+      margin-top: 12px;
+    }
+
+    .card-content {
+      padding: 32px 28px;
+    }
+
+    .form-group {
+      margin-bottom: 28px;
+    }
+
+    .form-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-bottom: 10px;
+      font-size: 0.9rem;
+    }
+
+    .form-label span:first-child {
+      font-size: 1.2rem;
+    }
+
+    select {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #e2e8f0;
+      border-radius: 24px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: white;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .triple-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 700px) {
+      .triple-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+    }
+
+    .live-preview {
+      background: linear-gradient(105deg, #f8fafc, #f1f5f9);
+      border-radius: 28px;
+      padding: 20px;
+      margin: 15px 0 25px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .preview-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #475569;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .info-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .chip {
+      background: white;
+      padding: 8px 16px;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .btn-primary {
+      width: 100%;
+      background: linear-gradient(100deg, #667eea, #764ba2);
+      border: none;
+      padding: 18px;
+      border-radius: 40px;
+      color: white;
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+      margin-top: 8px;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.97);
+    }
+
+    .hidden-link-container {
+      display: none;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      color: white;
+      padding: 14px 28px;
+      border-radius: 60px;
+      font-weight: 600;
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+      white-space: nowrap;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      font-size: 0.9rem;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.7rem;
+    }
+
+    @keyframes buttonSuccess {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.98); background: linear-gradient(100deg, #34d399, #10b981); }
+      100% { transform: scale(1); }
+    }
+
+    .btn-success {
+      animation: buttonSuccess 0.3s ease;
+    }
+
+    .ios-note {
+      margin-top: 10px;
+      font-size: 0.65rem;
+      color: #64748b;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="main-container">
+  <div class="glass-card">
+    <div class="card-header">
+      <h1>
+        <span>📱</span> iPhone Auto Copy Tool
+      </h1>
+      <p>Model · iOS Version (14.1 → 26.5) · Country</p>
+      <div class="feature-badge">🔒 Secret link | One-tap copy | Full Original iOS range</div>
+    </div>
+    <div class="card-content">
+      <div class="triple-grid">
+        <!-- iPhone Model -->
+        <div class="form-group">
+          <div class="form-label"><span>📱</span> iPhone Model</div>
+          <select id="iphoneModel">
+            <option value="iPhone11,8">iPhone XR</option>
+            <option value="iPhone11,2">iPhone XS</option>
+            <option value="iPhone11,6">iPhone XS Max</option>
+            <option value="iPhone12,1">iPhone 11</option>
+            <option value="iPhone12,3">iPhone 11 Pro</option>
+            <option value="iPhone12,5">iPhone 11 Pro Max</option>
+            <option value="iPhone13,1">iPhone 12 Mini</option>
+            <option value="iPhone13,2" selected>iPhone 12</option>
+            <option value="iPhone13,3">iPhone 12 Pro</option>
+            <option value="iPhone13,4">iPhone 12 Pro Max</option>
+            <option value="iPhone14,4">iPhone 13 Mini</option>
+            <option value="iPhone14,5">iPhone 13</option>
+            <option value="iPhone14,2">iPhone 13 Pro</option>
+            <option value="iPhone14,3">iPhone 13 Pro Max</option>
+            <option value="iPhone14,7">iPhone 14</option>
+            <option value="iPhone14,8">iPhone 14 Plus</option>
+            <option value="iPhone15,2">iPhone 14 Pro</option>
+            <option value="iPhone15,3">iPhone 14 Pro Max</option>
+            <option value="iPhone15,4">iPhone 15</option>
+            <option value="iPhone15,5">iPhone 15 Plus</option>
+            <option value="iPhone16,1">iPhone 15 Pro</option>
+            <option value="iPhone16,2">iPhone 15 Pro Max</option>
+            <option value="iPhone17,1">iPhone 16</option>
+            <option value="iPhone17,2">iPhone 16 Plus</option>
+            <option value="iPhone17,3">iPhone 16 Pro</option>
+            <option value="iPhone17,4">iPhone 16 Pro Max</option>
+            <option value="iPhone12,8">iPhone SE 2nd Gen</option>
+            <option value="iPhone14,6">iPhone SE 3rd Gen</option>
+          </select>
+        </div>
+
+        <!-- iOS Version - Now 14.1 to 26.5 -->
+        <div class="form-group">
+          <div class="form-label"><span>⚙️</span> iOS Version</div>
+          <select id="iosVersion">
+            <!-- iOS 14.1 to 14.8 -->
+            <option value="14.1">iOS 14.1</option>
+            <option value="14.2">iOS 14.2</option>
+            <option value="14.3">iOS 14.3</option>
+            <option value="14.4">iOS 14.4</option>
+            <option value="14.5">iOS 14.5</option>
+            <option value="14.6">iOS 14.6</option>
+            <option value="14.7">iOS 14.7</option>
+            <option value="14.8">iOS 14.8</option>
+            
+            <!-- iOS 15.0 to 15.8 -->
+            <option value="15.0">iOS 15.0</option>
+            <option value="15.1">iOS 15.1</option>
+            <option value="15.2">iOS 15.2</option>
+            <option value="15.3">iOS 15.3</option>
+            <option value="15.4">iOS 15.4</option>
+            <option value="15.5">iOS 15.5</option>
+            <option value="15.6">iOS 15.6</option>
+            <option value="15.7">iOS 15.7</option>
+            <option value="15.8">iOS 15.8</option>
+            
+            <!-- iOS 16.0 to 16.7 -->
+            <option value="16.0">iOS 16.0</option>
+            <option value="16.1">iOS 16.1</option>
+            <option value="16.2">iOS 16.2</option>
+            <option value="16.3">iOS 16.3</option>
+            <option value="16.4">iOS 16.4</option>
+            <option value="16.5">iOS 16.5</option>
+            <option value="16.6">iOS 16.6</option>
+            <option value="16.7">iOS 16.7</option>
+            
+            <!-- iOS 17.0 to 17.6 -->
+            <option value="17.0" selected>iOS 17.0</option>
+            <option value="17.1">iOS 17.1</option>
+            <option value="17.2">iOS 17.2</option>
+            <option value="17.3">iOS 17.3</option>
+            <option value="17.4">iOS 17.4</option>
+            <option value="17.5">iOS 17.5</option>
+            <option value="17.6">iOS 17.6</option>
+            
+            <!-- iOS 18.0 to 18.8 -->
+            <option value="18.0">iOS 18.0</option>
+            <option value="18.1">iOS 18.1</option>
+            <option value="18.2">iOS 18.2</option>
+            <option value="18.3">iOS 18.3</option>
+            <option value="18.4">iOS 18.4</option>
+            <option value="18.5">iOS 18.5</option>
+            <option value="18.6">iOS 18.6</option>
+            <option value="18.7">iOS 18.7</option>
+            <option value="18.8">iOS 18.8</option>
+            
+            <!-- iOS 19.0 to 19.8 -->
+            <option value="19.0">iOS 19.0</option>
+            <option value="19.1">iOS 19.1</option>
+            <option value="19.2">iOS 19.2</option>
+            <option value="19.3">iOS 19.3</option>
+            <option value="19.4">iOS 19.4</option>
+            <option value="19.5">iOS 19.5</option>
+            <option value="19.6">iOS 19.6</option>
+            <option value="19.7">iOS 19.7</option>
+            <option value="19.8">iOS 19.8</option>
+            
+            <!-- iOS 20.0 to 20.8 -->
+            <option value="20.0">iOS 20.0</option>
+            <option value="20.1">iOS 20.1</option>
+            <option value="20.2">iOS 20.2</option>
+            <option value="20.3">iOS 20.3</option>
+            <option value="20.4">iOS 20.4</option>
+            <option value="20.5">iOS 20.5</option>
+            <option value="20.6">iOS 20.6</option>
+            <option value="20.7">iOS 20.7</option>
+            <option value="20.8">iOS 20.8</option>
+            
+            <!-- iOS 21.0 to 21.8 -->
+            <option value="21.0">iOS 21.0</option>
+            <option value="21.1">iOS 21.1</option>
+            <option value="21.2">iOS 21.2</option>
+            <option value="21.3">iOS 21.3</option>
+            <option value="21.4">iOS 21.4</option>
+            <option value="21.5">iOS 21.5</option>
+            <option value="21.6">iOS 21.6</option>
+            <option value="21.7">iOS 21.7</option>
+            <option value="21.8">iOS 21.8</option>
+            
+            <!-- iOS 22.0 to 22.8 -->
+            <option value="22.0">iOS 22.0</option>
+            <option value="22.1">iOS 22.1</option>
+            <option value="22.2">iOS 22.2</option>
+            <option value="22.3">iOS 22.3</option>
+            <option value="22.4">iOS 22.4</option>
+            <option value="22.5">iOS 22.5</option>
+            <option value="22.6">iOS 22.6</option>
+            <option value="22.7">iOS 22.7</option>
+            <option value="22.8">iOS 22.8</option>
+            
+            <!-- iOS 23.0 to 23.8 -->
+            <option value="23.0">iOS 23.0</option>
+            <option value="23.1">iOS 23.1</option>
+            <option value="23.2">iOS 23.2</option>
+            <option value="23.3">iOS 23.3</option>
+            <option value="23.4">iOS 23.4</option>
+            <option value="23.5">iOS 23.5</option>
+            <option value="23.6">iOS 23.6</option>
+            <option value="23.7">iOS 23.7</option>
+            <option value="23.8">iOS 23.8</option>
+            
+            <!-- iOS 24.0 to 24.8 -->
+            <option value="24.0">iOS 24.0</option>
+            <option value="24.1">iOS 24.1</option>
+            <option value="24.2">iOS 24.2</option>
+            <option value="24.3">iOS 24.3</option>
+            <option value="24.4">iOS 24.4</option>
+            <option value="24.5">iOS 24.5</option>
+            <option value="24.6">iOS 24.6</option>
+            <option value="24.7">iOS 24.7</option>
+            <option value="24.8">iOS 24.8</option>
+            
+            <!-- iOS 25.0 to 25.8 -->
+            <option value="25.0">iOS 25.0</option>
+            <option value="25.1">iOS 25.1</option>
+            <option value="25.2">iOS 25.2</option>
+            <option value="25.3">iOS 25.3</option>
+            <option value="25.4">iOS 25.4</option>
+            <option value="25.5">iOS 25.5</option>
+            <option value="25.6">iOS 25.6</option>
+            <option value="25.7">iOS 25.7</option>
+            <option value="25.8">iOS 25.8</option>
+            
+            <!-- iOS 26.0 to 26.5 -->
+            <option value="26.0">iOS 26.0</option>
+            <option value="26.1">iOS 26.1</option>
+            <option value="26.2">iOS 26.2</option>
+            <option value="26.3">iOS 26.3</option>
+            <option value="26.4">iOS 26.4</option>
+            <option value="26.5">iOS 26.5</option>
+          </select>
+          <div class="ios-note">📱 Supported: iOS 14.1 through iOS 26.5 (including all major versions)</div>
+        </div>
+
+        <!-- Country Selection -->
+        <div class="form-group">
+          <div class="form-label"><span>🌐</span> Country / Region</div>
+          <select id="countrySelect">
+            <option value="US">🇺🇸 United States</option>
+            <option value="GB">🇬🇧 United Kingdom</option>
+            <option value="CA">🇨🇦 Canada</option>
+            <option value="AU">🇦🇺 Australia</option>
+            <option value="DE">🇩🇪 Germany</option>
+            <option value="FR">🇫🇷 France</option>
+            <option value="JP">🇯🇵 Japan</option>
+            <option value="KR">🇰🇷 South Korea</option>
+            <option value="IN">🇮🇳 India</option>
+            <option value="BR">🇧🇷 Brazil</option>
+            <option value="MX">🇲🇽 Mexico</option>
+            <option value="IT">🇮🇹 Italy</option>
+            <option value="ES">🇪🇸 Spain</option>
+            <option value="NL">🇳🇱 Netherlands</option>
+            <option value="SE">🇸🇪 Sweden</option>
+            <option value="NO">🇳🇴 Norway</option>
+            <option value="DK">🇩🇰 Denmark</option>
+            <option value="FI">🇫🇮 Finland</option>
+            <option value="PL">🇵🇱 Poland</option>
+            <option value="RU">🇷🇺 Russia</option>
+            <option value="CN">🇨🇳 China</option>
+            <option value="ZA">🇿🇦 South Africa</option>
+            <option value="EG">🇪🇬 Egypt</option>
+            <option value="SA">🇸🇦 Saudi Arabia</option>
+            <option value="AE">🇦🇪 UAE</option>
+            <option value="TR">🇹🇷 Turkey</option>
+            <option value="TH">🇹🇭 Thailand</option>
+            <option value="VN">🇻🇳 Vietnam</option>
+            <option value="MY">🇲🇾 Malaysia</option>
+            <option value="SG">🇸🇬 Singapore</option>
+            <option value="PH">🇵🇭 Philippines</option>
+            <option value="ID">🇮🇩 Indonesia</option>
+            <option value="PK">🇵🇰 Pakistan</option>
+            <option value="BD">🇧🇩 Bangladesh</option>
+            <option value="NG">🇳🇬 Nigeria</option>
+            <option value="AR">🇦🇷 Argentina</option>
+            <option value="CL">🇨🇱 Chile</option>
+            <option value="CO">🇨🇴 Colombia</option>
+            <option value="PE">🇵🇪 Peru</option>
+            <option value="NZ">🇳🇿 New Zealand</option>
+            <option value="IE">🇮🇪 Ireland</option>
+            <option value="PT">🇵🇹 Portugal</option>
+            <option value="GR">🇬🇷 Greece</option>
+            <option value="CZ">🇨🇿 Czechia</option>
+            <option value="HU">🇭🇺 Hungary</option>
+            <option value="RO">🇷🇴 Romania</option>
+            <option value="UA">🇺🇦 Ukraine</option>
+            <option value="IL">🇮🇱 Israel</option>
+            <option value="MA">🇲🇦 Morocco</option>
+            <option value="KE">🇰🇪 Kenya</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Live Preview - shows selections only -->
+      <div class="live-preview">
+        <div class="preview-title">🔮 CURRENT SELECTION</div>
+        <div class="info-chips">
+          <div class="chip"><i>📱</i> <span id="previewModelName">iPhone 12</span></div>
+          <div class="chip"><i>⚙️</i> iOS <span id="previewIOS">17.0</span></div>
+          <div class="chip"><i>🌍</i> <span id="previewCountry">United States</span></div>
+        </div>
+      </div>
+
+      <!-- Main Action Button -->
+      <button class="btn-primary" id="copyFullBtn">
+        <span>🔒</span> Secret Link
+        <span>📋</span>
+      </button>
+      
+      <!-- Hidden storage -->
+      <textarea id="hiddenLinkStorage" style="position: absolute; left: -9999px; top: -9999px; opacity: 0; pointer-events: none;"></textarea>
+      
+      <div style="margin-top: 20px; padding: 12px; background: #fef3c7; border-radius: 16px; font-size: 0.75rem; color: #92400e; text-align: center; border: 1px solid #fde68a;">
+        ⚡ <strong>Note:</strong> This website is owned by Md. Kamrul Hasan Korayshi <br>
+        📱 <strong>iOS Support:</strong> 14.1 → 26.5 (all versions included)
+      </div>
+    </div>
+  </div>
+  <footer>
+    🌍 50+ countries | iOS 14.1 - 26.5
+  </footer>
+</div>
+
+<div id="toastMsg" class="toast">✅ Secret Link copied successfully!</div>
+
+<script>
+  const modelSelect = document.getElementById('iphoneModel');
+  const iosSelect = document.getElementById('iosVersion');
+  const countrySelect = document.getElementById('countrySelect');
+  const previewModelSpan = document.getElementById('previewModelName');
+  const previewIOSSpan = document.getElementById('previewIOS');
+  const previewCountrySpan = document.getElementById('previewCountry');
+  const copyBtn = document.getElementById('copyFullBtn');
+  const hiddenStorage = document.getElementById('hiddenLinkStorage');
+
+  function getReadableModel() {
+    const option = modelSelect.options[modelSelect.selectedIndex];
+    return option ? option.textContent.trim() : 'iPhone';
+  }
+
+  function getCountryInfo() {
+    const selectedCode = countrySelect.value;
+    const selectedText = countrySelect.options[countrySelect.selectedIndex].text;
+    let countryName = selectedText.replace(/[🇺🇸🇬🇧🇨🇦🇦🇺🇩🇪🇫🇷🇯🇵🇰🇷🇮🇳🇧🇷🇲🇽🇮🇹🇪🇸🇳🇱🇸🇪🇳🇴🇩🇰🇫🇮🇵🇱🇷🇺🇨🇳🇿🇦🇪🇬🇸🇦🇦🇪🇹🇷🇹🇭🇻🇳🇲🇾🇸🇬🇵🇭🇮🇩🇵🇰🇧🇩🇳🇬🇦🇷🇨🇱🇨🇴🇵🇪🇳🇿🇮🇪🇵🇹🇬🇷🇨🇿🇭🇺🇷🇴🇺🇦🇮🇱🇲🇦🇰🇪]/g, '').trim();
+    return { code: selectedCode, name: countryName };
+  }
+
+  function updatePreview() {
+    previewModelSpan.textContent = getReadableModel();
+    previewIOSSpan.textContent = iosSelect.value;
+    const countryInfo = getCountryInfo();
+    previewCountrySpan.textContent = countryInfo.name;
+  }
+
+  function buildDynamicLink() {
+    const modelValue = modelSelect.value;
+    const iosVer = iosSelect.value;
+    const countryInfo = getCountryInfo();
+    const countryCode = countryInfo.code;
+    
+    const basePart = "https://accounts.google.com/v3/signin/identifier?app_version=20.20.5&as=OzWZDyTrYDX9rONxckRmGaV7AkYJgrBhU_RNiCNuSpY&auth_extension=ADa53XL66T-3YDtOjC92ft0Xtv_wD7GIHJFq830LHW8y_aeDOhWzVaeGdWCvrC_dU8MzszpSlIGn00HTMj_ETsvjxgJUT2Tt_x6Msa7vzkQg6RCo85jQSoOwH-BHCplJuWx49BUSikF&client_id=936475272427.apps.googleusercontent.com&code_challenge=eD0e8yMIPpR4jKPpQU0yZM0Wvcc2xNHNSNopimn7j3A&code_challenge_method=S256&color_scheme=dark&delegated_client_id=755541669657-kbosfavg7pk7sr3849c3tf657hpi5jpd.apps.googleusercontent.com&device_model=";
+    
+    const modelEncoded = encodeURIComponent(modelValue);
+    
+    const tailParams = `&device_name=iPhone&hl=en&gl=${countryCode}&system_version=${encodeURIComponent(iosVer)}&kdlc=1&kss=uca&lib_ver=3.4&ltmpl=youtube_main&redirect_uri=com.google.sso.755541669657-kbosfavg7pk7sr3849c3tf657hpi5jpd:/authCallback?login%3Dcode&sarp=1&scope=https://www.googleapis.com/auth/userinfo.email&service=youtube&sfas=1&flowName=GlifSetupSafariVC`;
+    
+    return basePart + modelEncoded + tailParams;
+  }
+
+  function storeHiddenLink() {
+    const link = buildDynamicLink();
+    hiddenStorage.value = link;
+    return link;
+  }
+
+  let toastTimeout = null;
+  function showToast(message = "✅ Secret link copied successfully!") {
+    const toast = document.getElementById('toastMsg');
+    toast.textContent = message;
+    toast.classList.add('show');
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2000);
+  }
+
+  async function copyToClipboard(text, successMsg = "✅ Secret Link copied to clipboard!") {
+    if (!text) {
+      showToast("⚠️ Failed to generate Secret link");
+      return false;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast(successMsg);
+      copyBtn.classList.add('btn-success');
+      setTimeout(() => copyBtn.classList.remove('btn-success'), 300);
+      return true;
+    } catch (err) {
+      const tempTextarea = document.createElement('textarea');
+      tempTextarea.value = text;
+      tempTextarea.style.position = 'fixed';
+      tempTextarea.style.left = '-9999px';
+      document.body.appendChild(tempTextarea);
+      tempTextarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempTextarea);
+      showToast(successMsg + " ✓");
+      copyBtn.classList.add('btn-success');
+      setTimeout(() => copyBtn.classList.remove('btn-success'), 300);
+      return true;
+    }
+  }
+
+  async function handleGenerateAndCopy() {
+    updatePreview();
+    const finalLink = buildDynamicLink();
+    storeHiddenLink();
+    await copyToClipboard(finalLink, "🔒Secret link copied.Paste in your browser🔒");
+  }
+
+  modelSelect.addEventListener('change', updatePreview);
+  iosSelect.addEventListener('change', updatePreview);
+  countrySelect.addEventListener('change', updatePreview);
+  copyBtn.addEventListener('click', handleGenerateAndCopy);
+  
+  updatePreview();
+  storeHiddenLink();
+</script>
+</body>
+</html>
